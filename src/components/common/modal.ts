@@ -20,6 +20,7 @@ export class Modal extends component<IModalData> {
 		super(container);
 
 		this._closeButton = ensureElement<HTMLButtonElement>(".modal__close", container);
+		this._content = ensureElement<HTMLElement>(".modal__content", container);
 
 		//Cлушатели событий для кнопки закрытия модального окна, контейнера модального окна и контента модального окна.
 		this._closeButton.addEventListener('click', this.close.bind(this));

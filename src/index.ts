@@ -80,14 +80,13 @@ events.on('preview:changed', (item: Product) => {
 
 events.on('product:add', (item: Product) => {
 	appData.addProduct(item);
-	// page.counter = appData.basket.length;
+
 	modal.close();
 });
 
 events.on('product:delete', (item: Product) => {
 	appData.deleteProduct(item);
-	// page.counter = appData.basket.length;
-	modal.close;
+	modal.close();
 });
 
 events.on('basket:change', () => {
