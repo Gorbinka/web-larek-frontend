@@ -1,6 +1,6 @@
 import './scss/styles.scss';
 
-import { AppState, CatalogChangeEvent, Product } from './components/appData';
+import { AppState, CatalogChangeEvent } from './components/appData';
 import { LarekApi } from './components/larekApi';
 import { ContactForm, DeliveryForm } from './components/order';
 import { Page } from './components/page';
@@ -57,11 +57,11 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 	});
 });
 
-events.on('card:select', (item: Product) => {
+events.on('card:select', (item: IProduct) => {
 	appData.setPreview(item);
 });
 
-events.on('preview:changed', (item: Product) => {
+events.on('preview:changed', (item: IProduct) => {
 	const card = new Card('card', cloneTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			events.emit('product:add', item);
@@ -78,13 +78,13 @@ events.on('preview:changed', (item: Product) => {
 	});
 });
 
-events.on('product:add', (item: Product) => {
+events.on('product:add', (item: IProduct) => {
 	appData.addProduct(item);
 
 	modal.close();
 });
 
-events.on('product:delete', (item: Product) => {
+events.on('product:delete', (item: IProduct) => {
 	appData.deleteProduct(item);
 	modal.close();
 });
@@ -174,26 +174,20 @@ events.on(
 );
 
 events.on('contacts:submit', () => {
-	api
-		.orderProduct(appData.order)
-		.then((result) => {
-			const success = new Success(cloneTemplate(successTemplate), {
-				onClick: () => {
-					modal.close();
-					appData.clearBasket();
-					appData.resetOrder();
-					page.counter = appData.basket.length;
-				},
-			});
-			modal.render({
-				content: success.render({
-					total: appData.getTotal(),
-				}),
-			});
-		})
-		.catch((err) => {
-			console.error(err);
-		});
+    api.orderProduct(appData.order)
+        .then((result) => {
+            modal.render({
+                content: successTemplate,
+            });
+            modal.сlose(() => {
+                appData.clearBasket();
+                appData.resetOrder();
+                page.counter = appData.basket.length;
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+        });
 });
 
 events.on('modal:open', () => {
