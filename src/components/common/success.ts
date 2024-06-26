@@ -1,7 +1,7 @@
 //Код представляет класс Success, который отображает успешное сообщение 
 //с общим количеством синапсов и имеет возможность передать действие при клике на элемент закрытия.
 
-import { ensureElement } from "../../utils/utils";
+import { ensureElement, formatNumber } from "../../utils/utils";
 import { component } from "../base/component";
 
 
@@ -24,15 +24,9 @@ export class Success extends component<ISuccess> {
 	constructor(container: HTMLElement, actions: ISuccessActions) {
 		super(container);
 
-		this._total = ensureElement<HTMLElement>(
-			'.order-success__description',
-			container
-		);
+		this._total = ensureElement<HTMLElement>('.order-success__description',container);
 
-		this._close = ensureElement<HTMLElement>(
-			'.order-success__close',
-			this.container
-		);
+		this._close = ensureElement<HTMLElement>('.order-success__close',this.container);
 //В конструкторе класса устанавливаются элементы _total и _close, а также добавляется слушатель событий.
 //При клике на элемент вызвано действие.
 		if (actions?.onClick) {

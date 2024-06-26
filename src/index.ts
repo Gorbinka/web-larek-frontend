@@ -1,6 +1,6 @@
 import './scss/styles.scss';
 
-import { AppState, CatalogChangeEvent } from './components/appData';
+import { AppState, CatalogChangeEvent, Product } from './components/appData';
 import { LarekApi } from './components/larekApi';
 import { ContactForm, DeliveryForm } from './components/order';
 import { Page } from './components/page';
@@ -57,11 +57,11 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 	});
 });
 
-events.on('card:select', (item: IProduct) => {
+events.on('card:select', (item: Product) => {
 	appData.setPreview(item);
 });
 
-events.on('preview:changed', (item: IProduct) => {
+events.on('preview:changed', (item: Product) => {
 	const card = new Card('card', cloneTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			events.emit('product:add', item);
@@ -78,15 +78,16 @@ events.on('preview:changed', (item: IProduct) => {
 	});
 });
 
-events.on('product:add', (item: IProduct) => {
+events.on('product:add', (item: Product) => {
 	appData.addProduct(item);
 
 	modal.close();
 });
 
-events.on('product:delete', (item: IProduct) => {
+events.on('product:delete', (item: Product) => {
 	appData.deleteProduct(item);
 	modal.close();
+	// basket.selected = appData.order.items;
 });
 
 events.on('basket:change', () => {
@@ -108,7 +109,7 @@ events.on('basket:change', () => {
 	basket.total = appData.getTotal();
 	page.counter = appData.basket.length;
 });
-
+  
 events.on('basket:open', () => {
 	basket.selected = appData.order.items;
 	modal.render({
@@ -148,6 +149,7 @@ events.on(
 );
 
 events.on('order:submit', () => {
+
 	modal.render({
 		content: contacts.render({
 			email: '',
@@ -156,6 +158,7 @@ events.on('order:submit', () => {
 			errors: [],
 		}),
 	});
+
 });
 
 events.on('contactsErrors:change', (errors: Partial<IContactForm>) => {
@@ -164,6 +167,7 @@ events.on('contactsErrors:change', (errors: Partial<IContactForm>) => {
 	contacts.errors = Object.values({ email, phone })
 		.filter((i) => !!i)
 		.join('; ');
+
 });
 
 events.on(
@@ -174,20 +178,30 @@ events.on(
 );
 
 events.on('contacts:submit', () => {
-    api.orderProduct(appData.order)
-        .then((result) => {
-            modal.render({
-                content: successTemplate,
-            });
-            modal.сlose(() => {
-                appData.clearBasket();
-                appData.resetOrder();
-                page.counter = appData.basket.length;
-            });
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+	
+	api.orderProduct(appData.order)
+		.then((result) => {
+			const success = new Success(cloneTemplate(successTemplate), {
+				onClick: () => {
+					modal.close();
+					appData.resetOrder();
+					//НЕ ПОНИМАЮ КАК ОБНУЛИТЬ VIEW у корзины, кликая по одному чтобы удалить удаляются все , но не удается сделать это в коде , 
+					//оставьте метки где менять что-то, уже совсем нет сил а время поджимает.
+					page.counter = appData.basket.length;
+					appData.clearBasket();
+					events.emit('basket:changed');
+
+				},
+			});
+			modal.render({
+				content: success.render({
+					total: appData.getTotal(),
+				}),
+			});
+		})
+		.catch((err) => {
+			console.error(err);
+		});
 });
 
 events.on('modal:open', () => {
@@ -198,8 +212,7 @@ events.on('modal:close', () => {
 	page.locked = false;
 });
 
-api
-	.getProductList()
+api.getProductList()
 	.then(appData.setCatalog.bind(appData))
 	.catch((err) => {
 		console.error(err);

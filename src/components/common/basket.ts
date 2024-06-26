@@ -25,7 +25,7 @@ export class Basket extends component<IBasket> {
 		super(container);
 
 		//Создает или находит элемент с селектором .basket__list в контейнере и присваивает его свойству _list.
-		this._list =ensureElement<HTMLElement>(".basket__list" , this.container);
+		this._list = ensureElement<HTMLElement>(".basket__list" , this.container);
 		this._total = this.container.querySelector('.basket__price');
 		this._button = this.container.querySelector('.basket__button');
 
@@ -52,7 +52,7 @@ export class Basket extends component<IBasket> {
 
 	//Установка свойства selected включает или отключает кнопку корзины в зависимости от выбранных элементов.
 	set selected(items: string[]) {
-		if (items.length) {
+		if (items.length !== 0) {
 			this.setDisabled(this._button, false);
 		} else {
 			this.setDisabled(this._button, true);

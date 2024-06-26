@@ -24,6 +24,14 @@ export class Card<T> extends component<ICard> {
 	protected _index?: HTMLElement;
 	protected _button?: HTMLButtonElement;
 
+	private categoryMap: Record<string, string> = {
+		'софт-скил': '_soft',
+		'другое': '_other',
+		'дополнительное': '_additional',
+		'кнопка': '_button',
+		'хард-скил': '_hard',
+	};
+
 	// В конструкторе класса Card принимаются параметры blockName (название блока), container (контейнер, в котором будет создана карточка) 
 	//и actions (действия, связанные с карточкой, например, обработчик события клика).
 	constructor(protected blockName: string, container: HTMLElement, actions?: ICardActions) {
@@ -34,6 +42,7 @@ export class Card<T> extends component<ICard> {
 		this._image = container.querySelector('.card__image');
 		this._description = container.querySelector<HTMLElement>(`.${blockName}__text`);
 		this._category = container.querySelector(`.card__category`);
+
 		this._price = ensureElement<HTMLElement>(`.${blockName}__price`, container);
 		this._index = container.querySelector<HTMLElement>(`.basket__item-index`);
 		this._button = container.querySelector('.card__button');
@@ -78,7 +87,14 @@ export class Card<T> extends component<ICard> {
 	//задает и возвращает категорию карточки;
 	set category(value: string) {
 		this.setText(this._category, value);
+
+		const baseClass = this._category.classList[0];
+		this._category.className = '';
+		this._category.classList.add(`${baseClass}`);
+		this._category.classList.add(`${baseClass}${this.categoryMap[value]}`);
 	}
+
+	
 
 	//задает и возвращает цену карточки, при этом если цена null, текст устанавливается как "Бесценно";
 	set price(value: number | null) {

@@ -54,6 +54,7 @@ export class Form<T> extends component<IFormState> {
 	//Cеттер для свойства valid, который управляет доступностью кнопки submit.
 	set valid(value: boolean) {
 		this._submit.disabled = !value;
+		
 	}
 	//Cеттер для свойства errors, который устанавливает текст ошибок в элемент _errors.
 	set errors(value: string) {

@@ -14,7 +14,7 @@ export interface IModalData {
 export class Modal extends component<IModalData> {
 	protected _closeButton:HTMLButtonElement;//кнопка закрытия модального окна
 	protected _content: HTMLElement;//контент модального окна
-	сlose: any;
+	//сlose: any;
 
 	//Конструктор класса принимает контейнер для модального окна и экземпляр IEvents.
 	constructor(container:HTMLElement, protected events: IEvents) {

@@ -16,6 +16,7 @@ export interface IProduct {
 	title: string; // Название товара
 	category: string; // Категория товара
 	price: number | null; // Стоимость товара
+	
 }
 
 //Интерфейс для типов формы заказа
