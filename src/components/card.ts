@@ -55,6 +55,10 @@ export class Card<T> extends component<ICard> {
 			}
 		}
 	}
+//Меняет текст кнопки при заказе
+	 btnText(text:string){
+		this.setText(this._button, text);
+	}
 
 	//задает и возвращает идентификатор карточки;
 	set id(value: string) {
@@ -110,4 +114,15 @@ export class Card<T> extends component<ICard> {
 	set index(value: string) {
 		this.setText(this._index, value);
 	}
+
+	setDisabledNonPriceButton(state: boolean) {
+		if (this._button) {
+		 if (state) {
+		  this._button.setAttribute('disabled', 'disabled');
+		 } else {
+		  this._button.removeAttribute('disabled');
+		 }
+		}
+	   }
+	  
 }

@@ -167,4 +167,9 @@ export class AppState extends Model<IAppState> {
 		this.events.emit('contactsErrors:change', this.formErrors);
 		return Object.keys(errors).length === 0;
 	}
+
+
+	orderStatus(item: IProduct): boolean {
+		return this.basket.includes(item);
+	   }
 }

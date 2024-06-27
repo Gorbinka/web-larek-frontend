@@ -50,6 +50,14 @@ export class Basket extends component<IBasket> {
 		}
 	}
 
+    checkBasket(total: number) {
+        if (total === 0) {
+            this._button.setAttribute('disabled', 'disabled');
+        } else {
+            this._button.removeAttribute('disabled');
+        }
+    }
+
 	//Установка свойства selected включает или отключает кнопку корзины в зависимости от выбранных элементов.
 	set selected(items: string[]) {
 		if (items.length !== 0) {
@@ -62,5 +70,6 @@ export class Basket extends component<IBasket> {
 	//Установка свойства total обновляет содержимое элемента _total с общей суммой синапсов, преобразуя ее в строку.
 	set total(total: number) {
 		this.setText(this._total, `${total.toString()} синапсов`);
+		this.checkBasket(total);
 	}
 }

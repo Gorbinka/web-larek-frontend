@@ -59,14 +59,36 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 
 events.on('card:select', (item: IProduct) => {
 	appData.setPreview(item);
+	
 });
 
 events.on('preview:changed', (item: IProduct) => {
 	const card = new Card('card', cloneTemplate(cardPreviewTemplate), {
+
 		onClick: () => {
-			events.emit('product:add', item);
+			if (item.price) {
+				if (appData.orderStatus(item)) {
+					appData.deleteProduct(item);
+					modal.close();
+				}
+			 	else {
+					events.emit('product:add', item);
+				}
+			}
 		},
-	});
+		}
+		 );
+		 const buttonText = item.price
+		  ? appData.orderStatus(item)
+		   ? 'Убрать'
+		   : 'В корзину'
+		  : '∞';
+		 card.setDisabledNonPriceButton(!item.price);
+		 card.btnText(buttonText);
+	// 	onClick: () => {
+	// 		events.emit('product:add', item);
+	// 	},
+	// });
 	modal.render({
 		content: card.render({
 			title: item.title,
@@ -88,6 +110,7 @@ events.on('product:delete', (item: IProduct) => {
 	appData.deleteProduct(item);
 	//modal.close();
 	 basket.selected = appData.order.items;
+	basket.checkBasket(basket.total);
 });
 
 events.on('basket:change', () => {
@@ -108,13 +131,16 @@ events.on('basket:change', () => {
 	basket.selected = appData.order.items;
 	basket.total = appData.getTotal();
 	page.counter = appData.basket.length;
+	basket.checkBasket(basket.total);
 });
   
 events.on('basket:open', () => {
 	basket.selected = appData.order.items;
+	
 	modal.render({
 		content: basket.render(),
 	});
+	basket.checkBasket(basket.total);
 });
 
 events.on('delivery:open', () => {
@@ -180,6 +206,7 @@ events.on(
 const success = new Success(cloneTemplate(successTemplate), {
 	onClick: () => {
 	  modal.close();// убрать из обработчика нельзя
+	  basket.checkBasket(basket.total);
 	  appData.resetOrder();
 	  page.counter = 0;
 	  appData.clearBasket();//ВООООООБЩЕ не догоняю чтос ним не так
