@@ -16,7 +16,8 @@ export interface IProduct {
 	title: string; // Название товара
 	category: string; // Категория товара
 	price: number | null; // Стоимость товара
-	
+	inBasket?: boolean;
+	quantity?: number; // Количество единиц товара
 }
 
 //Интерфейс для типов формы заказа

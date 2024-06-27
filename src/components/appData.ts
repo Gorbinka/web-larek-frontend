@@ -5,25 +5,25 @@ import { Model } from "./base/model";
 
 //определение типа CatalogChangeEvent для события изменения каталога товаров.
 export type CatalogChangeEvent = {
-	catalog: Product[];
+	catalog: IProduct[];
 };
 
 //определяется класс Product, который наследуется от Model<IProduct> и имеет свойства id, description, image, title, category и price.
 //Этот класс используется для представления информации о продукте.
-export class Product extends Model<IProduct> implements IProduct {
-	id: string;
-	description: string;
-	image: string;
-	title: string;
-	category: string;
-	price: number | null;
-}
+// export class Product extends Model<IProduct> implements IProduct {
+// 	id: string;
+// 	description: string;
+// 	image: string;
+// 	title: string;
+// 	category: string;
+// 	price: number | null;
+// }
 
 //класс AppState также расширяется от Model<IAppState> и содержит состояние приложения,
 //такие как catalog, basket (корзина), order (заказ), preview (предпросмотр) и formErrors (ошибки формы).
 export class AppState extends Model<IAppState> {
-	catalog: Product[];
-	basket: Product[] = [];
+	catalog: IProduct[];
+	basket: IProduct[] = [];
 	order: IOrder = {
 		payment: '',
 		address: '',
@@ -36,34 +36,47 @@ export class AppState extends Model<IAppState> {
 	formErrors: FormErrors = {};
 
 
-	// toggleOrderedLot(id: string, isIncluded: boolean) {
-    //     if (isIncluded) {
-    //         this.order.items = _.uniq([...this.order.items, id]);
-    //     } else {
-    //         this.order.items = _.without(this.order.items, id);
-    //     }
-    // }
-
 	//Очищает корзину и заказ.
 	clearBasket():void {
 		this.basket = [];
 		this.resetOrder();
-			this.emitChanges('basket:changed');
-// this.order.items.forEach(id => {
-// 	this.
-// });
+			this.emitChanges('basket:changed', this.basket);
+
 
 	}
 
 	//Добавляет продукт в корзину и обновляет статус заказа.
-	addProduct(item: Product): void {
+	addProduct(item: IProduct): void {
+
+		// const existingItemIndex = this.basket.findIndex((basketItem) => basketItem.id === item.id);
+
+		// if (existingItemIndex !== -1) {
+		// 	this.basket[existingItemIndex].quantity = (this.basket[existingItemIndex].quantity || 1) + 1; // Увеличиваем количество товара, если он уже есть в корзине
+		// } else {
+		// 	const newItem = { ...item, inBasket: true, quantity: 1 }; // Добавляем флаг inBasket и устанавливаем начальное количество товара
+		// 	this.basket.push(newItem); // Добавляем новый товар в корзину
+		// }
+	
+		// this.order.items = this.basket.map((basketItem) => basketItem.id);
+		// this.updateOrderItems(); // Обновляем общую стоимость заказа
+		// this.emitChanges('basket:changed', this.basket);
+		
 		this.basket.push(item);
 		this.order.items.push(item.id);
 		this.emitChanges('basket:change', this.basket);
 	}
 
+	// calculateOrderTotal(): void {
+	// 	this.order.total = this.basket.reduce((total, item) => total + (item.price || 0) * (item.quantity || 1), 0);
+	// }
+	
+	// // Модифицированный метод updateOrderItems для класса AppState
+	// updateOrderItems(): void {
+	// 	this.order.items = this.basket.map((basketItem) => basketItem.id);
+	// }
+
 	//Удаляет продукт из корзины и обновляет статус заказа.
-	deleteProduct(item: Product): void {
+	deleteProduct(item: IProduct): void {
 		const index = this.basket.indexOf(item);
 		if (index !== -1) {
 			this.basket.splice(index, 1);
@@ -89,10 +102,16 @@ export class AppState extends Model<IAppState> {
 	}
 
 	//Устанавливает каталог товаров и генерирует соответствующее событие изменения.
+	// setCatalog(items: IProduct[]) {
+	// 	this.catalog = items.map((item) => new Product(item, this.events));
+	// 	this.emitChanges('items:changed', { catalog: this.catalog });
+	// }
+
 	setCatalog(items: IProduct[]) {
-		this.catalog = items.map((item) => new Product(item, this.events));
+		this.catalog = items;
 		this.emitChanges('items:changed', { catalog: this.catalog });
-	}
+	  }
+	  
 
 	getOrderedProducts(): IProduct[] {
 		return this.basket;
@@ -100,7 +119,7 @@ export class AppState extends Model<IAppState> {
 
 
 	//Устанавливает товар для предпросмотра и генерирует соответствующее событие.
-	setPreview(item: Product) {
+	setPreview(item: IProduct) {
 		this.preview = item.id;
 		this.emitChanges('preview:changed', item);
 	}

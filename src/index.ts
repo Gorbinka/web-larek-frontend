@@ -1,6 +1,6 @@
 import './scss/styles.scss';
 
-import { AppState, CatalogChangeEvent, Product } from './components/appData';
+import { AppState, CatalogChangeEvent } from './components/appData';
 import { LarekApi } from './components/larekApi';
 import { ContactForm, DeliveryForm } from './components/order';
 import { Page } from './components/page';
@@ -57,11 +57,11 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 	});
 });
 
-events.on('card:select', (item: Product) => {
+events.on('card:select', (item: IProduct) => {
 	appData.setPreview(item);
 });
 
-events.on('preview:changed', (item: Product) => {
+events.on('preview:changed', (item: IProduct) => {
 	const card = new Card('card', cloneTemplate(cardPreviewTemplate), {
 		onClick: () => {
 			events.emit('product:add', item);
@@ -78,16 +78,16 @@ events.on('preview:changed', (item: Product) => {
 	});
 });
 
-events.on('product:add', (item: Product) => {
+events.on('product:add', (item: IProduct) => {
 	appData.addProduct(item);
-
+basket.render();
 	modal.close();
 });
 
-events.on('product:delete', (item: Product) => {
+events.on('product:delete', (item: IProduct) => {
 	appData.deleteProduct(item);
-	modal.close();
-	// basket.selected = appData.order.items;
+	//modal.close();
+	 basket.selected = appData.order.items;
 });
 
 events.on('basket:change', () => {
@@ -177,32 +177,64 @@ events.on(
 	}
 );
 
-events.on('contacts:submit', () => {
-	
+const success = new Success(cloneTemplate(successTemplate), {
+	onClick: () => {
+	  modal.close();// убрать из обработчика нельзя
+	  appData.resetOrder();
+	  page.counter = 0;
+	  appData.clearBasket();//ВООООООБЩЕ не догоняю чтос ним не так
+	  events.emit('basket:changed');
+	},
+  });
+  
+  events.on('contacts:submit', () => {
 	api.orderProduct(appData.order)
-		.then((result) => {
-			const success = new Success(cloneTemplate(successTemplate), {
-				onClick: () => {
-					modal.close();
-					appData.resetOrder();
-					//НЕ ПОНИМАЮ КАК ОБНУЛИТЬ VIEW у корзины, кликая по одному чтобы удалить удаляются все , но не удается сделать это в коде , 
-					//оставьте метки где менять что-то, уже совсем нет сил а время поджимает.
-					page.counter = appData.basket.length;
-					appData.clearBasket();
-					events.emit('basket:changed');
-
-				},
-			});
-			modal.render({
-				content: success.render({
-					total: appData.getTotal(),
-				}),
-			});
-		})
-		.catch((err) => {
-			console.error(err);
+	  .then((result) => {
+		modal.render({
+		  content: success.render({
+			total: appData.getTotal(),
+		  }),
 		});
-});
+		//success.render();
+		//modal.close(); // Закрываем модальное окно после рендеринга success
+		//appData.resetOrder(); // Сбрасываем заказ
+		
+		//appData.clearBasket(); // Очищаем корзину
+		//page.counter = 0;
+		//events.emit('basket:changed');
+	  })
+	  .catch((err) => {
+		console.error(err);
+	  });
+  });
+  
+
+
+
+// events.on('contacts:submit', () => {
+	
+// 	api.orderProduct(appData.order)
+// 		.then((result) => {
+// 			const success = new Success(cloneTemplate(successTemplate), {
+// 				onClick: () => {
+// 					modal.close();
+// 					appData.resetOrder();
+// 					page.counter = appData.basket.length;
+// 					appData.clearBasket();
+// 					events.emit('basket:changed');
+
+// 				},
+// 			});
+// 			modal.render({
+// 				content: success.render({
+// 					total: appData.getTotal(),
+// 				}),
+// 			});
+// 		})
+// 		.catch((err) => {
+// 			console.error(err);
+// 		});
+// });
 
 events.on('modal:open', () => {
 	page.locked = true;
