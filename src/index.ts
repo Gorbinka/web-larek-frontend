@@ -140,7 +140,7 @@ events.on('basket:open', () => {
 	modal.render({
 		content: basket.render(),
 	});
-	basket.checkBasket(basket.total);
+	//basket.checkBasket(basket.total);
 });
 
 events.on('delivery:open', () => {
