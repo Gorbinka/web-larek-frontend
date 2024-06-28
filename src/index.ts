@@ -85,10 +85,7 @@ events.on('preview:changed', (item: IProduct) => {
 		  : '∞';
 		 card.setDisabledNonPriceButton(!item.price);
 		 card.btnText(buttonText);
-	// 	onClick: () => {
-	// 		events.emit('product:add', item);
-	// 	},
-	// });
+
 	modal.render({
 		content: card.render({
 			title: item.title,
@@ -108,9 +105,11 @@ basket.render();
 
 events.on('product:delete', (item: IProduct) => {
 	appData.deleteProduct(item);
-	//modal.close();
+	basket.total = appData.getTotal();
+	modal.close();
 	 basket.selected = appData.order.items;
 	basket.checkBasket(basket.total);
+
 });
 
 events.on('basket:change', () => {
@@ -132,6 +131,7 @@ events.on('basket:change', () => {
 	basket.total = appData.getTotal();
 	page.counter = appData.basket.length;
 	basket.checkBasket(basket.total);
+
 });
   
 events.on('basket:open', () => {
@@ -140,7 +140,6 @@ events.on('basket:open', () => {
 	modal.render({
 		content: basket.render(),
 	});
-	//basket.checkBasket(basket.total);
 });
 
 events.on('delivery:open', () => {
@@ -205,12 +204,7 @@ events.on(
 
 const success = new Success(cloneTemplate(successTemplate), {
 	onClick: () => {
-	  modal.close();// убрать из обработчика нельзя
-	  basket.checkBasket(basket.total);
-	  appData.resetOrder();
-	  page.counter = 0;
-	  appData.clearBasket();//ВООООООБЩЕ не догоняю чтос ним не так
-	  events.emit('basket:changed');
+	  modal.close(); 
 	},
   });
   
@@ -222,46 +216,22 @@ const success = new Success(cloneTemplate(successTemplate), {
 			total: appData.getTotal(),
 		  }),
 		});
-		//success.render();
-		//modal.close(); // Закрываем модальное окно после рендеринга success
-		//appData.resetOrder(); // Сбрасываем заказ
 		
-		//appData.clearBasket(); // Очищаем корзину
-		//page.counter = 0;
-		//events.emit('basket:changed');
+		// Удаление всех элементов из корзины
+		while(appData.basket.length > 0) {
+		  appData.deleteProduct(appData.basket[0]);
+		}
+		
+		basket.total = appData.getTotal();
+		basket.selected = appData.order.items;
+		page.counter = appData.basket.length;
+		basket.render();
+		events.emit('basket:changed'); 
 	  })
 	  .catch((err) => {
 		console.error(err);
 	  });
   });
-  
-
-
-
-// events.on('contacts:submit', () => {
-	
-// 	api.orderProduct(appData.order)
-// 		.then((result) => {
-// 			const success = new Success(cloneTemplate(successTemplate), {
-// 				onClick: () => {
-// 					modal.close();
-// 					appData.resetOrder();
-// 					page.counter = appData.basket.length;
-// 					appData.clearBasket();
-// 					events.emit('basket:changed');
-
-// 				},
-// 			});
-// 			modal.render({
-// 				content: success.render({
-// 					total: appData.getTotal(),
-// 				}),
-// 			});
-// 		})
-// 		.catch((err) => {
-// 			console.error(err);
-// 		});
-// });
 
 events.on('modal:open', () => {
 	page.locked = true;

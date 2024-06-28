@@ -8,17 +8,6 @@ export type CatalogChangeEvent = {
 	catalog: IProduct[];
 };
 
-//определяется класс Product, который наследуется от Model<IProduct> и имеет свойства id, description, image, title, category и price.
-//Этот класс используется для представления информации о продукте.
-// export class Product extends Model<IProduct> implements IProduct {
-// 	id: string;
-// 	description: string;
-// 	image: string;
-// 	title: string;
-// 	category: string;
-// 	price: number | null;
-// }
-
 //класс AppState также расширяется от Model<IAppState> и содержит состояние приложения,
 //такие как catalog, basket (корзина), order (заказ), preview (предпросмотр) и formErrors (ошибки формы).
 export class AppState extends Model<IAppState> {
@@ -40,46 +29,22 @@ export class AppState extends Model<IAppState> {
 	clearBasket():void {
 		this.basket = [];
 		this.resetOrder();
-			this.emitChanges('basket:changed', this.basket);
-
-
+		this.emitChanges('basket:changed', this.basket);
 	}
 
 	//Добавляет продукт в корзину и обновляет статус заказа.
 	addProduct(item: IProduct): void {
-
-		// const existingItemIndex = this.basket.findIndex((basketItem) => basketItem.id === item.id);
-
-		// if (existingItemIndex !== -1) {
-		// 	this.basket[existingItemIndex].quantity = (this.basket[existingItemIndex].quantity || 1) + 1; // Увеличиваем количество товара, если он уже есть в корзине
-		// } else {
-		// 	const newItem = { ...item, inBasket: true, quantity: 1 }; // Добавляем флаг inBasket и устанавливаем начальное количество товара
-		// 	this.basket.push(newItem); // Добавляем новый товар в корзину
-		// }
-	
-		// this.order.items = this.basket.map((basketItem) => basketItem.id);
-		// this.updateOrderItems(); // Обновляем общую стоимость заказа
-		// this.emitChanges('basket:changed', this.basket);
-		
 		this.basket.push(item);
 		this.order.items.push(item.id);
 		this.emitChanges('basket:change', this.basket);
 	}
-
-	// calculateOrderTotal(): void {
-	// 	this.order.total = this.basket.reduce((total, item) => total + (item.price || 0) * (item.quantity || 1), 0);
-	// }
-	
-	// // Модифицированный метод updateOrderItems для класса AppState
-	// updateOrderItems(): void {
-	// 	this.order.items = this.basket.map((basketItem) => basketItem.id);
-	// }
 
 	//Удаляет продукт из корзины и обновляет статус заказа.
 	deleteProduct(item: IProduct): void {
 		const index = this.basket.indexOf(item);
 		if (index !== -1) {
 			this.basket.splice(index, 1);
+			this.order.items.splice(index, 1);
 		}
 		this.emitChanges('basket:change', this.basket);
 	}
@@ -101,12 +66,6 @@ export class AppState extends Model<IAppState> {
 		return this.basket.reduce((total, item) => total + item.price, 0);
 	}
 
-	//Устанавливает каталог товаров и генерирует соответствующее событие изменения.
-	// setCatalog(items: IProduct[]) {
-	// 	this.catalog = items.map((item) => new Product(item, this.events));
-	// 	this.emitChanges('items:changed', { catalog: this.catalog });
-	// }
-
 	setCatalog(items: IProduct[]) {
 		this.catalog = items;
 		this.emitChanges('items:changed', { catalog: this.catalog });
@@ -116,7 +75,6 @@ export class AppState extends Model<IAppState> {
 	getOrderedProducts(): IProduct[] {
 		return this.basket;
 	}
-
 
 	//Устанавливает товар для предпросмотра и генерирует соответствующее событие.
 	setPreview(item: IProduct) {
