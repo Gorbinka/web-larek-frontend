@@ -29,7 +29,7 @@ export class AppState extends Model<IAppState> {
 	clearBasket():void {
 		this.basket = [];
 		this.resetOrder();
-		this.emitChanges('basket:changed', this.basket);
+		this.emitChanges('basket:change', this.basket);
 	}
 
 	//Добавляет продукт в корзину и обновляет статус заказа.

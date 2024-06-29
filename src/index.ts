@@ -107,9 +107,8 @@ events.on('product:delete', (item: IProduct) => {
 	appData.deleteProduct(item);
 	basket.total = appData.getTotal();
 	modal.close();
-	 basket.selected = appData.order.items;
+	basket.selected = appData.order.items;
 	basket.checkBasket(basket.total);
-
 });
 
 events.on('basket:change', () => {
@@ -131,9 +130,8 @@ events.on('basket:change', () => {
 	basket.total = appData.getTotal();
 	page.counter = appData.basket.length;
 	basket.checkBasket(basket.total);
-
 });
-  
+
 events.on('basket:open', () => {
 	basket.selected = appData.order.items;
 	
@@ -217,16 +215,10 @@ const success = new Success(cloneTemplate(successTemplate), {
 		  }),
 		});
 		
-		// Удаление всех элементов из корзины
-		while(appData.basket.length > 0) {
-		  appData.deleteProduct(appData.basket[0]);
-		}
-		
+		appData.clearBasket();
 		basket.total = appData.getTotal();
 		basket.selected = appData.order.items;
 		page.counter = appData.basket.length;
-		basket.render();
-		events.emit('basket:changed'); 
 	  })
 	  .catch((err) => {
 		console.error(err);
